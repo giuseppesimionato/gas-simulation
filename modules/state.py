@@ -39,14 +39,11 @@ def validate(current_state, CONSTANTS):
     return current_state
 
 
-def update(sample, current_state, CONSTANTS):
+def update(sample, current_state, energies, CONSTANTS):
     for key in sample.keys():
         for observable, value in current_state[key].items():
             sample[key][observable].append(value)
     update_momenta(sample, CONSTANTS['MASS'])
-
-
-def update_energy(sample, energies, CONSTANTS):
     energy.update(sample, energies, CONSTANTS['EPSILON'], CONSTANTS['SIGMA'], CONSTANTS['MASS'])
 
 

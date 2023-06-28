@@ -3,7 +3,7 @@ import numpy as np
 
 
 def energy(total_energies):
-    plt.figure(figsize=(20,10))
+    plt.figure(figsize=(12,6))
     limit = 5000
 
     plt.plot(total_energies['total_energy'][:limit], color='g', label='total')
@@ -17,7 +17,7 @@ def energy(total_energies):
 
 
 def particle_trajectory(sample, radius):
-    fig = plt.figure(figsize=(20,20))
+    fig = plt.figure(figsize=(12,12))
     ax = fig.add_subplot(111, projection='3d')
 
     for particle in sample.values():
@@ -41,7 +41,7 @@ def particle_trajectory(sample, radius):
 
     
 def dynamic(sample, particle_number):
-    plt.figure(figsize=(24,22))
+    plt.figure(figsize=(12,12))
     plt.subplot(3,1,1)
     plt.plot(np.array(sample[particle_number]['position'])[:,0], label='x')
     plt.plot(np.array(sample[particle_number]['position'])[:,1], label='y')
