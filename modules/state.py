@@ -2,6 +2,7 @@ import position
 import velocity
 import acceleration
 import energy
+import collision
 
 
 def init(CONSTANTS):
@@ -33,9 +34,9 @@ def get(sample, CONSTANTS):
     return result
 
 
-def validate(current_state, CONSTANTS):
-    current_state = position.boundary_conditions(current_state, CONSTANTS['MAX_DISTANCE'])
-    current_state = position.elastic_collisions(current_state, CONSTANTS['SIGMA'], CONSTANTS['DT'] )
+def collisions(current_state, CONSTANTS):
+    current_state = collision.boundary(current_state, CONSTANTS['MAX_DISTANCE'])
+    current_state = collision.particle(current_state, CONSTANTS['SIGMA'], CONSTANTS['DT'] )
     return current_state
 
 
