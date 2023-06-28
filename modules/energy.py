@@ -10,13 +10,11 @@ def init(sample, CONSTANTS):
     update(sample, energies, CONSTANTS['EPSILON'], CONSTANTS['SIGMA'], CONSTANTS['MASS'])
     return energies 
 
-def get_potential(positions, epsilon, sigma):
-    for n, position in enumerate(positions):
-        positions[n] = 0.95*sigma if position < 0.95*sigma else position
-    return [
-        4*epsilon*((sigma/position)**12 - (sigma/position)**6)
-        for position in positions
-    ]
+
+def get_potential(position, epsilon, sigma):
+    # for n, position in enumerate(positions):
+    #     positions[n] = 0.95*sigma if position < 0.95*sigma else position
+    return 4*epsilon*((sigma/position)**12 - (sigma/position)**6) if position < 0.95*sigma else position
 
 
 def get_kinetic(velocity, MASS):
@@ -31,13 +29,13 @@ def update(sample, energies, EPSILON, SIGMA, MASS):
         for i in range(len(positions)):
             if i == key:
                 continue
-            position_differences = positions[i] - positions[key]
-            potential = get_potential(abs(position_differences), EPSILON, SIGMA)
+            position_differences = np.linalg.norm(positions[i] - positions[key])
+            potential = get_potential(position_differences, EPSILON, SIGMA)
             
-            interactions.append(sum(potential))
+            interactions.append(potential)
 
         sample[key]['kinetic_energy'].append(get_kinetic(particle['velocity'][-1], MASS))
-        sample[key]['potential_energy'].append(np.sum(interactions))# if interactions != [] else 0)
+        sample[key]['potential_energy'].append(np.sum(interactions)) # if interactions != [] else 0)
         sample[key]['total_energy'].append(sample[key]['kinetic_energy'][-1] + sample[key]['potential_energy'][-1])
     
     total_kinetic_energy = np.sum([particle['kinetic_energy'][-1] for particle in sample.values()])

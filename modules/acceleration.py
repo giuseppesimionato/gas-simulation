@@ -11,22 +11,17 @@ def update(index, sample, MASS, EPSILON, SIGMA, init=False):
             accelerations.append([0, 0, 0])
             continue
         position_differences = positions[i] - positions[index]
-        forces = lj_forces(abs(position_differences), EPSILON, SIGMA)
-        accelerations.append([
-            (position_difference/np.sqrt(position_difference**2)) * forces[n] / MASS
-            if position_difference != 0 else 0
-            for n, position_difference in enumerate(position_differences)
-        ])
+        position_differences_norm = np.linalg.norm(position_differences)
+        force = lj_forces(position_differences_norm, EPSILON, SIGMA)
+        forces = force*(position_differences/position_differences_norm)
+        accelerations.append(forces/MASS)
     return np.sum(accelerations, axis=0)
 
 
-def lj_forces(positions, epsilon, sigma):
-    for n, position in enumerate(positions):
-        positions[n] = 0.95*sigma if position < 0.95*sigma else position
-    return [
-        24*epsilon*((sigma**6)/(position**13))*(position**6 - 2*sigma**6)
-        for position in positions
-    ]
+def lj_forces(position, epsilon, sigma):
+    # for n, position in enumerate(positions):
+    #     positions[n] = 0.95*sigma if position < 0.95*sigma else position
+    return 24*epsilon*((sigma**6)/(position**13))*(position**6 - 2*sigma**6) if position < 0.95*sigma else position
 
 
 # def lj_forces(positions, epsilon, sigma):
