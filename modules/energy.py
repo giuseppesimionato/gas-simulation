@@ -33,7 +33,7 @@ def update(sample, energies, EPSILON, SIGMA, MASS):
                 continue
             position_differences = positions[i] - positions[key]
             potential = get_potential(abs(position_differences), EPSILON, SIGMA)
-            interactions.append(np.sqrt(np.sum(np.array(potential))**2))
+            interactions.append(np.sum(np.array(potential)))
         
         sample[key]['kinetic_energy'].append(get_kinetic(particle['velocity'][-1], MASS))
         sample[key]['potential_energy'].append(np.sum(interactions) if interactions != [] else 0)
