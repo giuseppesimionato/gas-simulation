@@ -1,21 +1,21 @@
 import numpy as np
 
 def init(number_of_particles, radius, min_distance):
-    volume_sfera = (4/3) * np.pi * radius**3
+    sphere_volume = (4/3) * np.pi * radius**3
     min_distance *= 2
-    numero_punti = int(volume_sfera / (min_distance**3))
-    punti_griglia = generate_grid(numero_punti, min_distance)
-    punti_griglia = (punti_griglia - np.mean(punti_griglia,
-                     axis=0)) * (radius / np.max(punti_griglia))
+    points_number = int(sphere_volume / (min_distance**3))
+    grid_points = generate_grid(points_number, min_distance)
+    grid_points = (grid_points - np.mean(grid_points,
+                     axis=0)) * (radius / np.max(grid_points))
 
     indici_selezione = np.random.choice(
-        len(punti_griglia), size=number_of_particles, replace=False)
+        len(grid_points), size=number_of_particles, replace=False)
 
-    return punti_griglia[indici_selezione]
+    return grid_points[indici_selezione]
 
 
-def update(time, particle):
-    return particle['position'][-1] + particle['velocity'][-1]*time + 0.5*particle['acceleration'][-1]*time**2
+def update(DT, particle):
+    return particle['position'][-1] + particle['velocity'][-1]*DT + 0.5*particle['acceleration'][-1]*DT**2
 
 
 def generate_grid(number_of_particles, node_distance):
@@ -23,28 +23,28 @@ def generate_grid(number_of_particles, node_distance):
     return np.array(np.meshgrid(coordinate, coordinate, coordinate)).T.reshape(-1, 3)
 
 
-def boundary_conditions(new_conditions):
+def boundary_conditions(new_conditions, MAX_DISTANCE):
     
     for key, particle in new_conditions.items():
-        norma_vettore_impatto = (particle['position'][0]**2 + particle['position'][1]**2 + particle['position'][2]**2)**0.5
-        if norma_vettore_impatto >= MAX_DISTANCE:
-            vettore_normalizzato = [particle['position'][0]/norma_vettore_impatto, particle['position'][1]/norma_vettore_impatto, particle['position'][2]/norma_vettore_impatto]
+        impact_vector_norm = (particle['position'][0]**2 + particle['position'][1]**2 + particle['position'][2]**2)**0.5
+        if impact_vector_norm >= MAX_DISTANCE:
+            normalized_vector = [particle['position'][0]/impact_vector_norm, particle['position'][1]/impact_vector_norm, particle['position'][2]/impact_vector_norm]
             particle['velocity'] = np.array([
-                particle['velocity'][0] - 2 * vettore_normalizzato[0] * (particle['velocity'][0] * vettore_normalizzato[0] + particle['velocity'][1] * vettore_normalizzato[1] + particle['velocity'][2] * vettore_normalizzato[2]), 
-                particle['velocity'][1] - 2 * vettore_normalizzato[1] * (particle['velocity'][0] * vettore_normalizzato[0] + particle['velocity'][1] * vettore_normalizzato[1] + particle['velocity'][2] * vettore_normalizzato[2]), 
-                particle['velocity'][2] - 2 * vettore_normalizzato[2] * (particle['velocity'][0] * vettore_normalizzato[0] + particle['velocity'][1] * vettore_normalizzato[1] + particle['velocity'][2] * vettore_normalizzato[2])
+                particle['velocity'][0] - 2 * normalized_vector[0] * (particle['velocity'][0] * normalized_vector[0] + particle['velocity'][1] * normalized_vector[1] + particle['velocity'][2] * normalized_vector[2]), 
+                particle['velocity'][1] - 2 * normalized_vector[1] * (particle['velocity'][0] * normalized_vector[0] + particle['velocity'][1] * normalized_vector[1] + particle['velocity'][2] * normalized_vector[2]), 
+                particle['velocity'][2] - 2 * normalized_vector[2] * (particle['velocity'][0] * normalized_vector[0] + particle['velocity'][1] * normalized_vector[1] + particle['velocity'][2] * normalized_vector[2])
             ])
             # TODO: Adjust posiiton for how much the atom should have bounced
-            particle['position'] = np.array(vettore_normalizzato)*MAX_DISTANCE
+            particle['position'] = np.array(normalized_vector)*MAX_DISTANCE
             
         new_conditions[key] = particle
         
     return new_conditions
 
 
-def elastic_collisions(new_state):
-    positions = [value['position'] for value in new_state.values()]
-    velocities = [value['velocity'] for value in new_state.values()]
+def elastic_collisions(current_state, SIGMA, DT):
+    positions = [value['position'] for value in current_state.values()]
+    velocities = [value['velocity'] for value in current_state.values()]
     num_objects = len(positions)
     radii = (0.95*SIGMA)/2
 
@@ -59,7 +59,7 @@ def elastic_collisions(new_state):
 
         # If no collision pairs found, exit the loop
         if len(collision_pairs) == 0:
-            return new_state
+            return current_state
 
         # Update positions and velocities after collisions
         for pair in collision_pairs:
@@ -80,16 +80,16 @@ def elastic_collisions(new_state):
                 velocities[i] -= impulse_vector / radii
                 velocities[j] += impulse_vector / radii
 
-                new_state[i]['velocity'] = velocities[i]
-                new_state[j]['velocity'] = velocities[j]
+                current_state[i]['velocity'] = velocities[i]
+                current_state[j]['velocity'] = velocities[j]
 
                 # Update positions
                 # TODO: check if DT is needed
-                new_state[i]['position'] += velocities[i]*DT
-                new_state[j]['position'] += velocities[j]*DT
+                current_state[i]['position'] += velocities[i]*DT
+                current_state[j]['position'] += velocities[j]*DT
 
 
-        return new_state
+        return current_state
 
 
 # def init(max_distance, not_allowed):

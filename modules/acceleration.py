@@ -1,6 +1,6 @@
 import numpy as np
 
-def update(index, sample, init=False):
+def update(index, sample, MASS, EPSILON, SIGMA, init=False):
     if init:
         positions = [particle['position'][-1] for particle in sample.values()]
     else:

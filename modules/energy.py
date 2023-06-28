@@ -7,7 +7,7 @@ def init(sample, CONSTANTS):
         'total_potential_energy': [],
         'total_energy': []
     }
-    add_energies(sample, energies, CONSTANTS)
+    update(sample, energies, CONSTANTS['EPSILON'], CONSTANTS['SIGMA'], CONSTANTS['MASS'])
     return energies 
 
 def get_potential(positions, epsilon, sigma):
@@ -19,11 +19,11 @@ def get_potential(positions, epsilon, sigma):
     ]
 
 
-def get_kinetic(velocity, CONSTANTS):
-    return np.sum(0.5*CONSTANTS['MASS']*(velocity**2))
+def get_kinetic(velocity, MASS):
+    return np.sum(0.5*MASS*(velocity**2))
 
 
-def add_energies(sample, total_energies, CONSTANTS):
+def update(sample, energies, EPSILON, SIGMA, MASS):
     
     positions = [particle['position'][-1] for particle in sample.values()]
     for key, particle in sample.items():
@@ -32,19 +32,19 @@ def add_energies(sample, total_energies, CONSTANTS):
             if i == key:
                 continue
             position_differences = positions[i] - positions[key]
-            potential = get_potential(abs(position_differences), CONSTANTS['EPSILON'], CONSTANTS['SIGMA'])
+            potential = get_potential(abs(position_differences), EPSILON, SIGMA)
             interactions.append(np.sqrt(np.sum(np.array(potential))**2))
         
-        sample[key]['kinetic_energy'].append(get_kinetic(particle['velocity'][-1], CONSTANTS))
+        sample[key]['kinetic_energy'].append(get_kinetic(particle['velocity'][-1], MASS))
         sample[key]['potential_energy'].append(np.sum(interactions) if interactions != [] else 0)
         sample[key]['total_energy'].append(sample[key]['kinetic_energy'][-1] + sample[key]['potential_energy'][-1])
     
     total_kinetic_energy = np.sum([particle['kinetic_energy'][-1] for particle in sample.values()])
     total_potential_energy = np.sum([particle['potential_energy'][-1] for particle in sample.values()])
 
-    total_energies['total_potential_energy'].append(total_potential_energy)
-    total_energies['total_kinetic_energy'].append(total_kinetic_energy)
-    total_energies['total'].append(total_kinetic_energy + total_potential_energy)
+    energies['total_potential_energy'].append(total_potential_energy)
+    energies['total_kinetic_energy'].append(total_kinetic_energy)
+    energies['total_energy'].append(total_kinetic_energy + total_potential_energy)
 
 
 # def lj_potential(position, epsilon, sigma):

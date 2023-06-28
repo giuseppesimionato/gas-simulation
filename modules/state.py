@@ -1,48 +1,55 @@
 import position
 import velocity
 import acceleration
+import energy
 
 
-def init(
-    particles_number,
-    temperature,
-    max_distance,
-    mass
-):
-    result = {}
-    positions = position.init(particles_number, max_distance, SIGMA)
-    for  key in range(particles_number):
-        result[key] = {
+def init(CONSTANTS):
+    sample = {}
+    positions = position.init(CONSTANTS['TOTAL_PARTICLES'], CONSTANTS['MAX_DISTANCE'], CONSTANTS['SIGMA'])
+    for  key in range(CONSTANTS['TOTAL_PARTICLES']):
+        sample[key] = {
             'position': [positions[key]],
-            'velocity': [velocity.init(temperature, mass)],
+            'velocity': [velocity.init(CONSTANTS['TEMPERATURE'],  CONSTANTS['MASS'])],
             'kinetic_energy' : [],
             'potential_energy': [],
             'total_energy': [],
         }
-    for key in result.keys():
-        result[key]['acceleration'] = [acceleration.update(key, result, True)]
-        result[key]['momentum'] = [result[key]['velocity'][-1]*MASS]
-    return result
+    for key in sample.keys():
+        sample[key]['acceleration'] = [acceleration.update(key, sample, CONSTANTS['MASS'], CONSTANTS['EPSILON'], CONSTANTS['SIGMA'], True)]
+        sample[key]['momentum'] = [sample[key]['velocity'][-1]* CONSTANTS['MASS']]
+    energies = energy.init(sample, CONSTANTS)
+    return sample, energies
 
 
-def get_new(sample, time):
+def get(sample, CONSTANTS):
     result = {}
     for key, particle in sample.items():
         result[key] = {}
-        result[key]['position'] = position.update(time, particle)
+        result[key]['position'] = position.update(CONSTANTS['DT'], particle)
     for key, particle in sample.items():
-        result[key]['acceleration'] = acceleration.update(key, result)
-        result[key]['velocity'] = velocity.update(time, particle['velocity'][-1], [particle['acceleration'][-1], result[key]['acceleration']])
+        result[key]['acceleration'] = acceleration.update(key, result, CONSTANTS['MASS'], CONSTANTS['EPSILON'], CONSTANTS['SIGMA'])
+        result[key]['velocity'] = velocity.update(CONSTANTS['DT'], particle['velocity'][-1], [particle['acceleration'][-1], result[key]['acceleration']])
     return result
 
 
-def update(sample, new_conditions):
+def validate(current_state, CONSTANTS):
+    current_state = position.boundary_conditions(current_state, CONSTANTS['MAX_DISTANCE'])
+    current_state = position.elastic_collisions(current_state, CONSTANTS['SIGMA'], CONSTANTS['DT'] )
+    return current_state
+
+
+def update(sample, current_state, CONSTANTS):
     for key in sample.keys():
-        for observable, value in new_conditions[key].items():
+        for observable, value in current_state[key].items():
             sample[key][observable].append(value)
-    update_momenta(sample)
+    update_momenta(sample, CONSTANTS['MASS'])
 
 
-def update_momenta(sample):
+def update_energy(sample, energies, CONSTANTS):
+    energy.update(sample, energies, CONSTANTS['EPSILON'], CONSTANTS['SIGMA'], CONSTANTS['MASS'])
+
+
+def update_momenta(sample, MASS):
     for key, particle in sample.items():
         sample[key]['momentum'].append(particle['velocity'][-1]*MASS)

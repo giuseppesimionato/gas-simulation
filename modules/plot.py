@@ -6,7 +6,7 @@ def energy(total_energies):
     plt.figure(figsize=(20,10))
     limit = 5000
 
-    plt.plot(total_energies['total'][:limit], color='g', label='total')
+    plt.plot(total_energies['total_energy'][:limit], color='g', label='total')
     plt.plot(total_energies['total_potential_energy'][:limit], color='r', label='potential')
     plt.plot(total_energies['total_kinetic_energy'][:limit], color='b', label='kinetic')
 
@@ -17,7 +17,6 @@ def energy(total_energies):
 
 
 def particle_trajectory(sample, radius):
-
     fig = plt.figure(figsize=(20,20))
     ax = fig.add_subplot(111, projection='3d')
 
