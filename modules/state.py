@@ -7,7 +7,7 @@ import energy
 def init(CONSTANTS):
     sample = {}
     positions = position.init(CONSTANTS['TOTAL_PARTICLES'], CONSTANTS['MAX_DISTANCE'], CONSTANTS['SIGMA'])
-    for  key in range(CONSTANTS['TOTAL_PARTICLES']):
+    for key in range(CONSTANTS['TOTAL_PARTICLES']):
         sample[key] = {
             'position': [positions[key]],
             'velocity': [velocity.init(CONSTANTS['TEMPERATURE'],  CONSTANTS['MASS'])],

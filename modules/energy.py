@@ -14,10 +14,12 @@ def init(sample, CONSTANTS):
 def get_potential(position, epsilon, sigma):
     # for n, position in enumerate(positions):
     #     positions[n] = 0.95*sigma if position < 0.95*sigma else position
-    return 4*epsilon*((sigma/position)**12 - (sigma/position)**6) if position < 0.95*sigma else position
+    position = sigma if position < 1.01*sigma else position
+    return 4*epsilon*((sigma/position)**12 - (sigma/position)**6) 
 
 
 def get_kinetic(velocity, MASS):
+    velocity = np.sqrt(velocity[0]**2 + velocity[1]**2 + velocity[2]**2)
     return np.sum(0.5*MASS*(velocity**2))
 
 

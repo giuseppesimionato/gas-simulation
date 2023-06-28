@@ -8,10 +8,10 @@ def init(number_of_particles, radius, min_distance):
     grid_points = (grid_points - np.mean(grid_points,
                      axis=0)) * (radius / np.max(grid_points))
 
-    indici_selezione = np.random.choice(
+    selection_index = np.random.choice(
         len(grid_points), size=number_of_particles, replace=False)
 
-    return grid_points[indici_selezione]
+    return grid_points[selection_index]
 
 
 def update(DT, particle):

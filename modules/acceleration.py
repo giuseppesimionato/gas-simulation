@@ -3,8 +3,10 @@ import numpy as np
 def update(index, sample, MASS, EPSILON, SIGMA, init=False):
     if init:
         positions = [particle['position'][-1] for particle in sample.values()]
+       
     else:
         positions = [particle['position'] for particle in sample.values()]
+        
     accelerations = []
     for i in range(len(positions)):
         if i == index:
@@ -20,8 +22,9 @@ def update(index, sample, MASS, EPSILON, SIGMA, init=False):
 
 def lj_forces(position, epsilon, sigma):
     # for n, position in enumerate(positions):
-    #     positions[n] = 0.95*sigma if position < 0.95*sigma else position
-    return 24*epsilon*((sigma**6)/(position**13))*(position**6 - 2*sigma**6) if position < 0.95*sigma else position
+    #      positions[n] = 0.95*sigma if position < 0.95*sigma else position
+    position = sigma if position < 1.01*sigma else position
+    return 24*epsilon*((sigma**6)/(position**13))*(position**6 - 2*sigma**6)
 
 
 # def lj_forces(positions, epsilon, sigma):
