@@ -35,7 +35,7 @@ def get(sample, CONSTANTS):
 
 
 def collisions(current_state, CONSTANTS):
-    current_state = collision.boundary(current_state, CONSTANTS['MAX_DISTANCE'])
+    current_state = collision.boundary(current_state, CONSTANTS)
     current_state = collision.particle(current_state, CONSTANTS['SIGMA'], CONSTANTS['DT'] )
     return current_state
 

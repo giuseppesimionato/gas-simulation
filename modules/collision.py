@@ -1,11 +1,13 @@
 import numpy as np
+import velocity
+import acceleration
 
 
-def boundary(new_conditions, MAX_DISTANCE):
+def boundary(new_conditions, CONSTANTS):
     
     for key, particle in new_conditions.items():
         impact_vector_norm = (particle['position'][0]**2 + particle['position'][1]**2 + particle['position'][2]**2)**0.5
-        if impact_vector_norm >= MAX_DISTANCE:
+        if impact_vector_norm >= CONSTANTS['MAX_DISTANCE']:
             normalized_vector = [particle['position'][0]/impact_vector_norm, particle['position'][1]/impact_vector_norm, particle['position'][2]/impact_vector_norm]
             particle['velocity'] = np.array([
                 particle['velocity'][0] - 2 * normalized_vector[0] * (particle['velocity'][0] * normalized_vector[0] + particle['velocity'][1] * normalized_vector[1] + particle['velocity'][2] * normalized_vector[2]), 
@@ -13,7 +15,7 @@ def boundary(new_conditions, MAX_DISTANCE):
                 particle['velocity'][2] - 2 * normalized_vector[2] * (particle['velocity'][0] * normalized_vector[0] + particle['velocity'][1] * normalized_vector[1] + particle['velocity'][2] * normalized_vector[2])
             ])
             
-            particle['position'] = np.array(normalized_vector)*MAX_DISTANCE
+            particle['position'] = np.array(normalized_vector)*CONSTANTS['MAX_DISTANCE']
             
             #TODO: update acceleration according to new positions and velocities
 
@@ -26,7 +28,7 @@ def particle(current_state, SIGMA, DT):
     positions = [value['position'] for value in current_state.values()]
     velocities = [value['velocity'] for value in current_state.values()]
     num_objects = len(positions)
-    radii = (0.95*SIGMA)/2
+    radii = (SIGMA)/2
 
     while True:
         # Check for collision pairs
