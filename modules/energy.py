@@ -17,11 +17,8 @@ def get_potential(position, epsilon, sigma):
 
 
 def get_cutoff_potential(position, epsilon, sigma):
-    # cutoff = 2.5*sigma
-    # if position >= cutoff:
-    #     return 0
     position = sigma if position < 1.01*sigma else position
-    return 4*epsilon*((sigma/position)**12 - (sigma/position)**6) # + 4*epsilon*((sigma/cutoff)**12 - (sigma/cutoff)**6)
+    return 4*epsilon*((sigma/position)**12 - (sigma/position)**6)
 
 
 def get_kinetic(velocity, MASS):
@@ -43,7 +40,7 @@ def update(sample, energies, EPSILON, SIGMA, MASS):
             interactions.append(potential)
 
         sample[key]['kinetic_energy'].append(get_kinetic(particle['velocity'][-1], MASS))
-        sample[key]['potential_energy'].append(np.sum(interactions)) # if interactions != [] else 0)
+        sample[key]['potential_energy'].append(np.sum(interactions))
         sample[key]['total_energy'].append(sample[key]['kinetic_energy'][-1] + sample[key]['potential_energy'][-1])
     
     total_kinetic_energy = np.sum([particle['kinetic_energy'][-1] for particle in sample.values()])
