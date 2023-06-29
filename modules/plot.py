@@ -50,7 +50,8 @@ def dynamic(sample, particle_number):
     plt.plot(np.array(sample[particle_number]['position'])[:,0], label='x')
     plt.plot(np.array(sample[particle_number]['position'])[:,1], label='y')
     plt.plot(np.array(sample[particle_number]['position'])[:,2], label='z')
-    plt.title('position', fontsize=20)
+    plt.title('Position', fontsize=20)
+    plt.ylabel('Position', fontsize=15)
     plt.grid(linestyle='--')
     plt.legend()
 
@@ -58,7 +59,8 @@ def dynamic(sample, particle_number):
     plt.plot(np.array(sample[particle_number]['velocity'])[:,0], label='x')
     plt.plot(np.array(sample[particle_number]['velocity'])[:,1], label='y')
     plt.plot(np.array(sample[particle_number]['velocity'])[:,2], label='z')
-    plt.title('velocity', fontsize=20)
+    plt.title('Velocity', fontsize=20)
+    plt.ylabel('Velocity', fontsize=15)
     plt.grid(linestyle='--')
     plt.legend()
 
@@ -66,7 +68,9 @@ def dynamic(sample, particle_number):
     plt.plot(np.array(sample[particle_number]['acceleration'])[:,0], label='x')
     plt.plot(np.array(sample[particle_number]['acceleration'])[:,1], label='y')
     plt.plot(np.array(sample[particle_number]['acceleration'])[:,2], label='z')
-    plt.title('acceleration', fontsize=20)
+    plt.title('Acceleration', fontsize=20)
+    plt.xlabel('Timestep', fontsize=15)
+    plt.ylabel('Acceleration', fontsize=15)
     plt.grid(linestyle='--')
     plt.legend()
 
