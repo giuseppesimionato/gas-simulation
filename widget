@@ -1,0 +1,231 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "84f60e3b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import sys\n",
+    "sys.path.append('./modules')\n",
+    "from tqdm import tqdm as progress\n",
+    "\n",
+    "from modules import state\n",
+    "from modules import plot\n",
+    "\n",
+    "import numpy as np\n",
+    "from matplotlib import pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "e6b4d4ea",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "CONSTANTS = {\n",
+    "    'DT': 0.005,\n",
+    "    'MAX_DISTANCE' : 6, # angstrom\n",
+    "    'TOTAL_PARTICLES' : 1,\n",
+    "    'MAX_TIME_STEPS' : 1000000,\n",
+    "    'MASS' : 39.95,  # argon amu\n",
+    "    'TEMPERATURE' : 300,  # K\n",
+    "    'EPSILON' : 0.0105, # eV\n",
+    "    'SIGMA' : 3.44  # angstrom\n",
+    "}\n",
+    "\n",
+    "\n",
+    "sample, energies = state.init(CONSTANTS)\n",
+    "\n",
+    "for time in progress(range(CONSTANTS['MAX_TIME_STEPS'])):\n",
+    "\n",
+    "    current_state  = state.get(sample, CONSTANTS)\n",
+    "    current_state, _ = state.collisions(current_state, CONSTANTS)\n",
+    "    state.update(sample, current_state, energies, CONSTANTS)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "5c820efd",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import sys\n",
+    "sys.path.append('./modules')\n",
+    "from tqdm import tqdm as progress\n",
+    "\n",
+    "from modules import state\n",
+    "from modules import plot\n",
+    "\n",
+    "import numpy as np\n",
+    "from matplotlib import pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "5f7e5078",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "CONSTANTS = {\n",
+    "    'DT': 0.005,\n",
+    "    'MAX_DISTANCE' : 6, # angstrom\n",
+    "    'TOTAL_PARTICLES' : 1,\n",
+    "    'MAX_TIME_STEPS' : 1000,\n",
+    "    'MASS' : 39.95,  # argon amu\n",
+    "    'TEMPERATURE' : 300,  # K\n",
+    "    'EPSILON' : 0.0105, # eV\n",
+    "    'SIGMA' : 3.44  # angstrom\n",
+    "}\n",
+    "\n",
+    "\n",
+    "sample, energies = state.init(CONSTANTS)\n",
+    "\n",
+    "for time in progress(range(CONSTANTS['MAX_TIME_STEPS'])):\n",
+    "\n",
+    "    current_state  = state.get(sample, CONSTANTS)\n",
+    "    current_state, _ = state.collisions(current_state, CONSTANTS)\n",
+    "    state.update(sample, current_state, energies, CONSTANTS)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "7382cb64",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def lj_potential(positions, epsilon, sigma):\n",
+    "    for n, position in enumerate(positions):\n",
+    "        positions[n] = 0.9*sigma if position < 0.9*sigma else position\n",
+    "    return [\n",
+    "        4*epsilon*((sigma/position)**12 - (sigma/position)**6)\n",
+    "        for position in positions\n",
+    "    ]\n",
+    "\n",
+    "def lj_force(positions, epsilon, sigma):\n",
+    "    for n, position in enumerate(positions):\n",
+    "        positions[n] = 0.9*sigma if position < 0.9*sigma else position\n",
+    "    return [\n",
+    "        24*epsilon*((sigma**6)/(position**13))*(position**6 - 2*sigma**6)\n",
+    "        for position in positions\n",
+    "    ]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "354917ca",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "r = np.linspace(-3, 12, 10000)\n",
+    "plt.figure(figsize=(15,8))\n",
+    "plt.plot(r, lj_potential(r, CONSTANTS['EPSILON'], CONSTANTS['SIGMA']), label='lj potential')\n",
+    "plt.plot(r, lj_force(r, CONSTANTS['EPSILON'], CONSTANTS['SIGMA']), label='lj force')\n",
+    "plt.scatter(CONSTANTS['SIGMA'], 0, c='r')\n",
+    "plt.legend()\n",
+    "plt.title('Lennard-Jones potential and force', fontsize=20)\n",
+    "plt.grid(linestyle='--')\n",
+    "plt.xlim(2, 5)\n",
+    "plt.ylim(-0.3, 0.05)\n",
+    "plt.xticks(np.arange(2, 10, 1))\n",
+    "plt.xlabel('Distance', fontsize=15)\n",
+    "plt.ylabel('Potential/Force', fontsize=15)\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "f397b30f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot.energy(energies)\n",
+    "plot.particle_trajectory(sample, CONSTANTS['MAX_DISTANCE'])\n",
+    "plot.dynamic(sample, 0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "de3ca683",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import plotly.io as pio\n",
+    "pio.renderers.default = \"notebook_connected\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "46d00a62",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import plotly.express as px\n",
+    "import pandas as pd\n",
+    "\n",
+    "for particle in sample.values():\n",
+    "    x = np.array(particle['position'])[:, 0]\n",
+    "    y = np.array(particle['position'])[:, 1]\n",
+    "    z = np.array(particle['position'])[:, 2]\n",
+    "\n",
+    "u = np.linspace(0, 2 * np.pi, 100)\n",
+    "v = np.linspace(0, np.pi, 100)\n",
+    "x_sphere = CONSTANTS['MAX_DISTANCE'] * np.outer(np.cos(u), np.sin(v))\n",
+    "y_sphere = CONSTANTS['MAX_DISTANCE'] * np.outer(np.sin(u), np.sin(v))\n",
+    "z_sphere = CONSTANTS['MAX_DISTANCE'] * np.outer(np.ones(np.size(u)), np.cos(v))\n",
+    "\n",
+    "df = pd.DataFrame([x,y,z])\n",
+    "\n",
+    "px.scatter_3d(df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "549bf7c5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import plotly.io as pio"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "f2c4accd",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import plotly.express as px\n",
+    "import pandas as pd\n",
+    "\n",
+    "for particle in sample.values():\n",
+    "    x = np.array(particle['position'])[:, 0]\n",
+    "    y = np.array(particle['position'])[:, 1]\n",
+    "    z = np.array(particle['position'])[:, 2]\n",
+    "\n",
+    "u = np.linspace(0, 2 * np.pi, 100)\n",
+    "v = np.linspace(0, np.pi, 100)\n",
+    "x_sphere = CONSTANTS['MAX_DISTANCE'] * np.outer(np.cos(u), np.sin(v))\n",
+    "y_sphere = CONSTANTS['MAX_DISTANCE'] * np.outer(np.sin(u), np.sin(v))\n",
+    "z_sphere = CONSTANTS['MAX_DISTANCE'] * np.outer(np.ones(np.size(u)), np.cos(v))\n",
+    "\n",
+    "df = pd.DataFrame([x,y,z])\n",
+    "\n",
+    "px.scatter_3d(df)"
+   ]
+  }
+ ],
+ "metadata": {},
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

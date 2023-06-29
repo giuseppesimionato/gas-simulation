@@ -9,7 +9,6 @@ def energy(total_energies):
     total_energy = total_energies['total_potential_energy'][-1]+total_energies['total_kinetic_energy'][-1]
     plt.hlines(total_energy, 0, len(total_energies['total_potential_energy']), color='g', label='total')
     plt.plot(np.array(total_energies['total_potential_energy'][:limit]), color='r', label='potential')
-    # plt.plot(total_energies['total_kinetic_energy'][:limit], color='b', label='kinetic')
     plt.plot(np.full_like(np.array(total_energies['total_potential_energy'][:limit]), total_energy) - np.array(total_energies['total_potential_energy'][:limit]), color='b', label='kinetic')
 
     plt.title('Energies', fontsize=15)

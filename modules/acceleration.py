@@ -26,8 +26,8 @@ def lj_forces(position, epsilon, sigma):
 
 
 def get_cutoff_forces(position, epsilon, sigma):
-    cutoff = 2.5*sigma
-    if position >= cutoff:
-        return 0
+    # cutoff = 2.5*sigma
+    # if position >= cutoff:
+    #     return 0
     position = sigma if position < 1.01*sigma else position
-    return 24*epsilon*((sigma**6)/(position**13))*(position**6 - 2*sigma**6) + 24*epsilon*((sigma**6)/(cutoff**13))*(cutoff**6 - 2*sigma**6)
+    return 24*epsilon*((sigma**6)/(position**13))*(position**6 - 2*sigma**6) # + 24*epsilon*((sigma**6)/(cutoff**13))*(cutoff**6 - 2*sigma**6)

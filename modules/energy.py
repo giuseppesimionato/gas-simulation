@@ -17,11 +17,11 @@ def get_potential(position, epsilon, sigma):
 
 
 def get_cutoff_potential(position, epsilon, sigma):
-    cutoff = 2.5*sigma
-    if position >= cutoff:
-        return 0
+    # cutoff = 2.5*sigma
+    # if position >= cutoff:
+    #     return 0
     position = sigma if position < 1.01*sigma else position
-    return 4*epsilon*((sigma/position)**12 - (sigma/position)**6) + 4*epsilon*((sigma/cutoff)**12 - (sigma/cutoff)**6)
+    return 4*epsilon*((sigma/position)**12 - (sigma/position)**6) # + 4*epsilon*((sigma/cutoff)**12 - (sigma/cutoff)**6)
 
 
 def get_kinetic(velocity, MASS):
