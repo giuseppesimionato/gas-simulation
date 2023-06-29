@@ -12,10 +12,16 @@ def init(sample, CONSTANTS):
 
 
 def get_potential(position, epsilon, sigma):
-    # for n, position in enumerate(positions):
-    #     positions[n] = 0.95*sigma if position < 0.95*sigma else position
     position = sigma if position < 1.01*sigma else position
-    return 4*epsilon*((sigma/position)**12 - (sigma/position)**6) 
+    return 4*epsilon*((sigma/position)**12 - (sigma/position)**6)
+
+
+def get_cutoff_potential(position, epsilon, sigma):
+    cutoff = 2.5*sigma
+    if position >= cutoff:
+        return 0
+    position = sigma if position < 1.01*sigma else position
+    return 4*epsilon*((sigma/position)**12 - (sigma/position)**6) + 4*epsilon*((sigma/cutoff)**12 - (sigma/cutoff)**6)
 
 
 def get_kinetic(velocity, MASS):
@@ -32,7 +38,7 @@ def update(sample, energies, EPSILON, SIGMA, MASS):
             if i == key:
                 continue
             position_differences = np.linalg.norm(positions[i] - positions[key])
-            potential = get_potential(position_differences, EPSILON, SIGMA)
+            potential = get_cutoff_potential(position_differences, EPSILON, SIGMA)
             
             interactions.append(potential)
 
@@ -46,10 +52,3 @@ def update(sample, energies, EPSILON, SIGMA, MASS):
     energies['total_potential_energy'].append(total_potential_energy)
     energies['total_kinetic_energy'].append(total_kinetic_energy)
     energies['total_energy'].append(total_kinetic_energy + total_potential_energy)
-
-
-# def lj_potential(position, epsilon, sigma):
-#     if position > CUTOFF:
-#         return 0
-#     position = SIGMA if position < SIGMA else position
-#     return 48 * epsilon * np.power(sigma, 12) / np.power(position, 13) - 24 * epsilon * np.power(sigma, 6) / np.power(position, 7)

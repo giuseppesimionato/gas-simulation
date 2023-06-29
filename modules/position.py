@@ -21,10 +21,3 @@ def update(DT, particle):
 def generate_grid(number_of_particles, node_distance):
     coordinate = np.arange(number_of_particles) * node_distance
     return np.array(np.meshgrid(coordinate, coordinate, coordinate)).T.reshape(-1, 3)
-
-
-# def init(max_distance, not_allowed):
-#     position = np.random.uniform(-max_distance, max_distance, size=3)
-#     while (position[0]**2 + position[1]**2 + position[2]**2)**0.5 >= MAX_DISTANCE:
-#         position = np.random.uniform(-max_distance, max_distance, size=3)
-#     return position

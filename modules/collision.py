@@ -1,10 +1,8 @@
 import numpy as np
-import velocity
-import acceleration
 
 
 def boundary(new_conditions, CONSTANTS):
-    
+    collided = False
     for key, particle in new_conditions.items():
         impact_vector_norm = (particle['position'][0]**2 + particle['position'][1]**2 + particle['position'][2]**2)**0.5
         if impact_vector_norm >= CONSTANTS['MAX_DISTANCE']:
@@ -16,12 +14,11 @@ def boundary(new_conditions, CONSTANTS):
             ])
             
             particle['position'] = np.array(normalized_vector)*CONSTANTS['MAX_DISTANCE']
-            
-            #TODO: update acceleration according to new positions and velocities
+            collided = True
 
         new_conditions[key] = particle
         
-    return new_conditions
+    return new_conditions, collided
 
 
 def particle(current_state, SIGMA, DT):
@@ -69,8 +66,6 @@ def particle(current_state, SIGMA, DT):
                 # TODO: check if DT is needed
                 current_state[i]['position'] += velocities[i]*DT
                 current_state[j]['position'] += velocities[j]*DT
-
-        #TODO: update acceleration according to new positions and velocities
 
         return current_state
     

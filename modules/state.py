@@ -31,13 +31,14 @@ def get(sample, CONSTANTS):
     for key, particle in sample.items():
         result[key]['acceleration'] = acceleration.update(key, result, CONSTANTS['MASS'], CONSTANTS['EPSILON'], CONSTANTS['SIGMA'])
         result[key]['velocity'] = velocity.update(CONSTANTS['DT'], particle['velocity'][-1], [particle['acceleration'][-1], result[key]['acceleration']])
+    result, _ = collisions(result, CONSTANTS)
     return result
 
 
 def collisions(current_state, CONSTANTS):
-    current_state = collision.boundary(current_state, CONSTANTS)
-    current_state = collision.particle(current_state, CONSTANTS['SIGMA'], CONSTANTS['DT'] )
-    return current_state
+    current_state, collided = collision.boundary(current_state, CONSTANTS)
+    current_state = collision.particle(current_state, CONSTANTS['SIGMA'], CONSTANTS['DT'])
+    return current_state, collided
 
 
 def update(sample, current_state, energies, CONSTANTS):
